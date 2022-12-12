@@ -1,0 +1,51 @@
+?start : newicklist
+
+newicklist : newicktree+
+
+newicktree : node ";"
+
+node :  children? nodename? annotations?
+
+annotations : ":" (support extendedannotation?
+                   |extendedannotation support?)
+            | extendedannotation (":"? support)?
+
+children : "(" (node ",")* node ")"
+
+nodename : string
+
+support : NUMBER
+
+extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]"
+
+//annotationlist : annotation (":" annotation)*
+//               | annotation ("," annotation)*
+
+
+annotationlist : (annotation ":")* annotation
+               | (annotation ",")* annotation
+
+annotation : annotationname "=" data
+
+annotationname : CNAME
+
+?data : list | dtype
+
+// lists with separator | may not be nested, but lists with directional
+// delimeters may be:
+list : (dtype "|")+ dtype
+     | "[" (data ",")* data "]"
+     | "(" (data ",")* data ")"
+     | "{" (data ",")* data "}"
+
+?dtype : number | string
+
+ALLOW_STRING : /[^,:\(\)\[\]\n\r\0;]+/
+string : ESCAPED_STRING | ALLOW_STRING
+number : NUMBER
+
+%import common.ESCAPED_STRING
+%import common.CNAME
+%import common.NUMBER
+%import common.WS
+%ignore WS
