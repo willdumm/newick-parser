@@ -6,13 +6,16 @@ newicktree : node ";"
 
 node :  children? nodename? annotations?
 
+children : "(" (node ",")* node ")"
+
+nodename : quoted_escaped_string
+         | NODENAME_STRING
+
+NODENAME_STRING : /[^:\[\](),\;\n\r\0]+/
+
 annotations : ":" (support extendedannotation?
                    |extendedannotation support?)
             | extendedannotation (":"? support)?
-
-children : "(" (node ",")* node ")"
-
-nodename : string
 
 support : NUMBER
 
@@ -29,23 +32,42 @@ annotation : annotationname "=" data
 
 annotationname : CNAME
 
-?data : list | dtype
-
 // lists with separator | may not be nested, but lists with directional
-// delimeters may be:
-list : (dtype "|")+ dtype
-     | "[" (data ",")* data "]"
-     | "(" (data ",")* data ")"
-     | "{" (data ",")* data "}"
+// delimeters may be, so they're defined separately:
+data : list | bar_sep_list | standalone_dtype
 
-?dtype : number | string
+bar_sep_list : bar_list_dtype ("|" bar_list_dtype)+
 
-ALLOW_STRING : /[^,:\(\)\[\]\n\r\0;]+/
-string : ESCAPED_STRING | ALLOW_STRING
+standalone_dtype : number | quoted_escaped_string | STANDALONE_DATA_STRING
+
+STANDALONE_DATA_STRING : /[^ :,\[\]{}\(\)|]+/
+
+list : "[" (list_data ",")* list_data "]"
+     | "(" (list_data ",")* list_data ")"
+     | "{" (list_data ",")* list_data "}"
+
+bar_list_dtype : number | quoted_escaped_string | BAR_SEP_STRING
+BAR_SEP_STRING : /[^,:\[\]|{}]+/
+
+list_data : list | list_dtype
+
+list_dtype : number | quoted_escaped_string | LIST_DATA_STRING
+LIST_DATA_STRING : /[^ ,:\(\)\[\]{}]+/
+
 number : NUMBER
 
-%import common.ESCAPED_STRING
+quoted_escaped_string : ESCAPED_SINGLE_QUOTE_STRING
+                       | ESCAPED_DOUBLE_QUOTE_STRING
+
+_STRING_INNER: /.*?/
+_STRING_ESC_INNER: _STRING_INNER /(?<!\\)(\\\\)*?/
+
+ESCAPED_DOUBLE_QUOTE_STRING : "\"" _STRING_ESC_INNER "\""
+ESCAPED_SINGLE_QUOTE_STRING : "\'" _STRING_ESC_INNER "\'"
+
 %import common.CNAME
 %import common.NUMBER
 %import common.WS
+%import common.WS_INLINE
 %ignore WS
+%ignore WS_INLINE
