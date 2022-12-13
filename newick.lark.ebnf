@@ -1,6 +1,6 @@
 ?start : newicklist
 
-newicklist : newicktree+
+newicklist : newicktree+    -> list
 
 newicktree : node ";"
 
@@ -17,13 +17,9 @@ annotations : ":" (support extendedannotation?
                    |extendedannotation support?)
             | extendedannotation (":"? support)?
 
-support : NUMBER
+support : number
 
 extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]"
-
-//annotationlist : annotation (":" annotation)*
-//               | annotation ("," annotation)*
-
 
 annotationlist : (annotation ":")* annotation
                | (annotation ",")* annotation
@@ -36,9 +32,11 @@ annotationname : CNAME
 // delimeters may be, so they're defined separately:
 data : list | bar_sep_list | standalone_dtype
 
-bar_sep_list : bar_list_dtype ("|" bar_list_dtype)+
+bar_sep_list : bar_list_dtype ("|" bar_list_dtype)+ -> list
 
-standalone_dtype : number | quoted_escaped_string | STANDALONE_DATA_STRING
+?standalone_dtype : number
+                 | quoted_escaped_string
+                 | STANDALONE_DATA_STRING   -> string
 
 STANDALONE_DATA_STRING : /[^ :,\[\]{}\(\)|]+/
 
@@ -46,15 +44,21 @@ list : "[" (list_data ",")* list_data "]"
      | "(" (list_data ",")* list_data ")"
      | "{" (list_data ",")* list_data "}"
 
-bar_list_dtype : number | quoted_escaped_string | BAR_SEP_STRING
+?bar_list_dtype : number
+               | quoted_escaped_string
+               | BAR_SEP_STRING         -> string
 BAR_SEP_STRING : /[^,:\[\]|{}]+/
 
-list_data : list | list_dtype
+?list_data : list | list_dtype
 
-list_dtype : number | quoted_escaped_string | LIST_DATA_STRING
+?list_dtype : number
+            | quoted_escaped_string
+            | LIST_DATA_STRING          -> string
+
 LIST_DATA_STRING : /[^ ,:\(\)\[\]{}]+/
 
-number : NUMBER
+number : SIGNED_INT     -> integer
+       | SIGNED_FLOAT   -> float
 
 quoted_escaped_string : ESCAPED_SINGLE_QUOTE_STRING
                        | ESCAPED_DOUBLE_QUOTE_STRING
@@ -66,7 +70,8 @@ ESCAPED_DOUBLE_QUOTE_STRING : "\"" _STRING_ESC_INNER "\""
 ESCAPED_SINGLE_QUOTE_STRING : "\'" _STRING_ESC_INNER "\'"
 
 %import common.CNAME
-%import common.NUMBER
+%import common.SIGNED_INT
+%import common.SIGNED_FLOAT
 %import common.WS
 %import common.WS_INLINE
 %ignore WS

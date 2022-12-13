@@ -1,9 +1,11 @@
-from lark import Lark
+from lark import Lark, Transformer
+from tree_transformer import TreelistTransformer
 
 nwks = [
     "((,),);",
     "A;",
-    "A:1;"
+    "A:1;",
+    "'A':1;",
     "((A,B),C)D;",
     "((A:1,B)E:1.0,C)D;",
     ("((A:1,B)E:[&NHX:rate=1:one=2]1.0,C)D;\n"
@@ -23,3 +25,10 @@ for nwk in nwks:
     print(nwk)
     print("was parsed as:")
     print(newick_parser.parse(nwk).pretty())
+    # tree = newick_parser.parse(nwk)
+    # print(TreelistTransformer().transform(tree))
+
+
+with open('clade_13.GTR.history.trees', 'r') as fh:
+    print(newick_parser.parse(fh.read()).pretty())
+
