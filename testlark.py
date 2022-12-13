@@ -14,10 +14,14 @@ nwks = [
     "England/CAMC-B515AC/2020|2020-11-08:1;",
     "((one:1[&&NHX:list=1|2|3:set=1|2|3:tuple=1|2|3],B));",
     '"node1"[&&NHX:list={1,2,3}:string=string_val:nested_list={1,2,[2, 3, [3, 4]]}:tuple={1,2,3}:set={1,2,3}:float=1.2345656777:nested_tuple={(1, 2),(2, 3)}];',
+    "'A':1;",
 ]
 
 with open('newick.lark.ebnf', 'r') as fh:
     newick_parser = Lark(fh, parser='lalr')
+
+with open('newick.lark.ebnf', 'r') as fh:
+    newick_parser_inline = Lark(fh, parser='lalr', transformer=TreelistTransformer())
     # newick_parser = Lark(fh, debug=True)
 
 for nwk in nwks:
@@ -25,10 +29,14 @@ for nwk in nwks:
     print(nwk)
     print("was parsed as:")
     print(newick_parser.parse(nwk).pretty())
-    # tree = newick_parser.parse(nwk)
-    # print(TreelistTransformer().transform(tree))
+    tree = newick_parser.parse(nwk)
+    tl = TreelistTransformer().transform(tree)
+    for t in tl:
+        print(t)
 
 
+
+print("here")
 with open('clade_13.GTR.history.trees', 'r') as fh:
-    print(newick_parser.parse(fh.read()).pretty())
+    t = newick_parser_inline.parse(fh.read())
 

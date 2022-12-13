@@ -2,7 +2,7 @@
 
 newicklist : newicktree+    -> list
 
-newicktree : node ";"
+?newicktree : node ";"
 
 node :  children? nodename? annotations?
 
@@ -19,7 +19,7 @@ annotations : ":" (support extendedannotation?
 
 support : number
 
-extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]"
+?extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]"
 
 annotationlist : (annotation ":")* annotation
                | (annotation ",")* annotation
@@ -30,7 +30,7 @@ annotationname : CNAME
 
 // lists with separator | may not be nested, but lists with directional
 // delimeters may be, so they're defined separately:
-data : list | bar_sep_list | standalone_dtype
+?data : list | bar_sep_list | standalone_dtype
 
 bar_sep_list : bar_list_dtype ("|" bar_list_dtype)+ -> list
 
@@ -61,13 +61,13 @@ number : SIGNED_INT     -> integer
        | SIGNED_FLOAT   -> float
 
 quoted_escaped_string : ESCAPED_SINGLE_QUOTE_STRING
-                       | ESCAPED_DOUBLE_QUOTE_STRING
+                      | ESCAPED_DOUBLE_QUOTE_STRING
 
 _STRING_INNER: /.*?/
 _STRING_ESC_INNER: _STRING_INNER /(?<!\\)(\\\\)*?/
 
 ESCAPED_DOUBLE_QUOTE_STRING : "\"" _STRING_ESC_INNER "\""
-ESCAPED_SINGLE_QUOTE_STRING : "\'" _STRING_ESC_INNER "\'"
+ESCAPED_SINGLE_QUOTE_STRING : "'" _STRING_ESC_INNER "'"
 
 %import common.CNAME
 %import common.SIGNED_INT
