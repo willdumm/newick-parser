@@ -33,7 +33,7 @@ class TreelistTransformer(Transformer):
     def annotationlist(self, s):
         return list(s)
 
-    def node(self, s):
+    def internal_node(self, s):
         n = ete3.TreeNode()
         for parse_child in s:
             if parse_child.data == 'children':
@@ -44,6 +44,9 @@ class TreelistTransformer(Transformer):
             elif parse_child.data == 'nodename':
                 n.name = str(parse_child.children[0])
         return n
+
+    def leaf_node(self, s):
+        return self.internal_node(s)
 
 
 

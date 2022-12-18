@@ -2,11 +2,15 @@
 
 newicklist : newicktree+    -> list
 
-?newicktree : node ";"
+?newicktree : abstract_node ";"
 
-node :  children? nodename? annotations?
+?abstract_node :  internal_node | leaf_node
 
-children : "(" (node ",")* node ")"
+internal_node : children nodename? annotations?
+
+leaf_node : nodename? annotations?
+
+children : "(" (abstract_node ",")* abstract_node ")"
 
 nodename : quoted_escaped_string
          | NODENAME_STRING
