@@ -17,12 +17,11 @@ nwks = [
     "'A':1;",
 ]
 
-with open('newick.lark.ebnf', 'r') as fh:
+with open('newick.lark', 'r') as fh:
     newick_parser = Lark(fh, parser='lalr')
 
-with open('newick.lark.ebnf', 'r') as fh:
+with open('newick.lark', 'r') as fh:
     newick_parser_inline = Lark(fh, parser='lalr', transformer=TreelistTransformer())
-    # newick_parser = Lark(fh, debug=True)
 
 for nwk in nwks:
     print()
