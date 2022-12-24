@@ -1,4 +1,4 @@
-from lark import Transformer
+from lark import Transformer, Lark
 from lark.visitors import Discard
 import ete3
 
@@ -85,3 +85,34 @@ class NexusTransformer(TreelistTransformer):
 
     def beast_file(self, s):
         return s[1]
+
+with open('newick.lark', 'r') as fh:
+    _nexus_parser = Lark(fh, parser='lalr', start='beast_file', transformer=NexusTransformer())
+
+with open('newick.lark', 'r') as fh:
+    _newick_parser = Lark(fh, parser='lalr', start='newicklist', transformer=TreelistTransformer())
+
+def parse_newick(data):
+    """Parse a string containing concatenated newick strings.
+
+    Returns a list of ete3.Tree objects containing the parsed trees."""
+    return _newick_parser.parse(data)
+
+def parse_newick_file(filepath):
+    """Parse a file containing newick strings.
+
+    Returns a list of ete3.Tree objects containing the parsed trees."""
+    with open(filepath, 'r') as fh:
+        return _newick_parser.parse(fh.read())
+
+def parse_nexus_file(filepath):
+    """Parse a nexus file output by Beast.
+
+    Returns a list of ete3.Tree objects containing the parsed trees. Leaves have taxon names in the ``name`` attribute, and
+    tree root nodes have ``beast_name``, ``beast_annotations``, and ``rice_annotation`` attributes containing tree annotations.
+    All other extended newick annotations are saved in the corresponding attribute on each node."""
+    with open(filepath, 'r') as fh:
+        for line in fh:
+            if "Begin trees;" in line:
+                data = fh.read()
+    return _nexus_parser.parse(data)
