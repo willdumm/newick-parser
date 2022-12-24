@@ -1,6 +1,6 @@
 // // Beast nexus definitions:
 
-beastfile : translate_block treelist
+beast_file : translate_block beast_treelist
 
 ?translate_block : "Translate" leaf_mapping ";"
 
@@ -13,13 +13,13 @@ integer : INT
 taxon_name : TAXON_NAME
 TAXON_NAME : /[^ ,\n\r]+/
 
-treelist : beast_tree+
+beast_treelist : beast_tree+ -> list
 
-beast_tree : "tree" tree_annotation extendedannotation "=" "[&" rice_annotation "]" newicktree
+beast_tree : "tree" beast_name extendedannotation "=" "[&" rice_annotation "]" newicktree
 
-tree_annotation : CNAME
+beast_name : CNAME -> string
 
-rice_annotation : CNAME
+rice_annotation : CNAME -> string
 // // Newick tree definitions:
 
 ?start : newicklist

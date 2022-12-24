@@ -3,7 +3,7 @@ from tree_transformer import TreelistTransformer, NexusTransformer
 
 
 with open('newick.lark', 'r') as fh:
-    beast_translate_parser = Lark(fh, parser='lalr', start='beastfile', transformer=NexusTransformer())
+    beast_translate_parser = Lark(fh, parser='lalr', start='beast_file', transformer=NexusTransformer())
 
 # with open('newick.lark.ebnf', 'r') as fh:
 #     newick_parser_inline = Lark(fh, parser='lalr', transformer=TreelistTransformer())
@@ -17,4 +17,4 @@ with open("clade_13.GTR.trees.nexus", 'r') as fh:
             data = fh.read()
 
 trees = beast_translate_parser.parse(data)
-print(trees.pretty())
+print(trees)

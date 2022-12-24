@@ -59,7 +59,6 @@ class NexusTransformer(TreelistTransformer):
         return str(s[0])
 
     def leaf_mapping(self, s):
-        print(s)
         leaf_map = dict(s)
         self.leaf_map = leaf_map
         return Discard
@@ -80,8 +79,9 @@ class NexusTransformer(TreelistTransformer):
     def beast_tree(self, s):
         tree = s[-1]
         tree.add_feature("beast_name", s[0])
-        tree.add_feature("beast_annotations", s[1])
+        tree.add_feature("beast_annotations", dict(s[1]))
         tree.add_feature("rice_annotation", s[2])
         return tree
 
-
+    def beast_file(self, s):
+        return s[1]
