@@ -1,5 +1,7 @@
 // // Beast nexus definitions:
-beast_file : translate_block beast_treelist
+beast_file : translate_block_wrapper beast_treelist
+
+?translate_block_wrapper : translate_block
 
 ?translate_block : "Translate" leaf_mapping ";"
 

@@ -61,8 +61,10 @@ class NexusTransformer(TreelistTransformer):
     def leaf_mapping(self, s):
         leaf_map = dict(s)
         self.leaf_map = leaf_map
-        return Discard
+        return leaf_map
 
+    def translate_block_wrapper(self, s):
+        return Discard
 
     def leaf_node(self, s):
         n = ete3.TreeNode()
@@ -86,11 +88,61 @@ class NexusTransformer(TreelistTransformer):
     def beast_file(self, s):
         return s[1]
 
-with open('newick.lark', 'r') as fh:
-    _nexus_parser = Lark(fh, parser='lalr', start='beast_file', transformer=NexusTransformer())
+
 
 with open('newick.lark', 'r') as fh:
-    _newick_parser = Lark(fh, parser='lalr', start='newicklist', transformer=TreelistTransformer())
+    newick_lark_string = fh.read()
+    
+_nexus_parser = Lark(newick_lark_string, parser='lalr', start='beast_file', transformer=NexusTransformer())
+
+_nexus_translate_block_parser = Lark(newick_lark_string, parser='lalr', start='translate_block', transformer=NexusTransformer())
+
+_newick_parser = Lark(newick_lark_string, parser='lalr', start='newicklist', transformer=TreelistTransformer())
+
+
+class NexusIterator:
+
+    def __init__(self, nexus_filename):
+        self.file = nexus_filename
+        self.nexus_newick_parser = self.get_beast_tree_parser()
+
+    def get_beast_tree_parser(self):
+        with open(self.file, 'r') as fh:
+            for line in fh:
+                if "Begin trees;" in line:
+                    break
+            data = ""
+            for line in fh:
+                if ';' in line:
+                    data += line
+                    break
+                else:
+                    data += line
+
+        transformer = NexusTransformer()
+        transformer.leaf_map = _nexus_translate_block_parser.parse(data)
+        return Lark(newick_lark_string, parser='lalr', start='beast_tree', transformer=transformer)
+        
+
+    def iter_tree_sections(self):
+        with open(self.file, 'r') as fh:
+            for line in fh:
+                if "tree STATE" in line[:12]:
+                    current_tree = line
+                    break
+            for line in fh:
+                if "tree STATE" in line[:12]:
+                    yield current_tree
+                    current_tree = line
+                else:
+                    current_tree += line
+        yield current_tree
+
+    def iter_trees(self):
+        for treestring in self.iter_tree_sections():
+            yield self.nexus_newick_parser.parse(treestring)
+
+
 
 def parse_newick(data):
     """Parse a string containing concatenated newick strings.
@@ -116,3 +168,10 @@ def parse_nexus_file(filepath):
             if "Begin trees;" in line:
                 data = fh.read()
     return _nexus_parser.parse(data)
+
+def iter_nexus_trees(filepath):
+    """Parse a nexus file output by Beast.
+    Loads and yields one tree at a time, avoiding loading all trees in memory at once.
+    """
+    parser_wrapper = NexusIterator(filepath)
+    yield from parser_wrapper.iter_trees()

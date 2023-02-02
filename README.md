@@ -15,3 +15,8 @@ Functions for parsing files can be found in `tree_transformer.py`, for example,
 * `parse_newick`
 * `parse_newick_file`
 * `parse_nexus_file`
+* `iter_nexus_trees`
+
+
+All node attributes are added as ete3.TreeNode attributes, with the same
+attribute name that appears in the newick annotation.
