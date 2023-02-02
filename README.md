@@ -18,5 +18,5 @@ Functions for parsing files can be found in `tree_transformer.py`, for example,
 * `iter_nexus_trees`
 
 
-All node attributes are added as ete3.TreeNode attributes, with the same
-attribute name that appears in the newick annotation.
+All node attributes are added as `ete3.TreeNode` attributes, preserved by tree
+copy, with the same attribute name that appears in the newick annotation.
