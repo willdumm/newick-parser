@@ -34,6 +34,9 @@ class TreelistTransformer(Transformer):
     def annotationlist(self, s):
         return list(s)
 
+    def extendedannotationlist(self, s):
+        return [it for ls in s for it in ls]
+
     def internal_node(self, s):
         return self.leaf_node(s)
 
@@ -154,6 +157,8 @@ class NexusIterator:
                 if "tree STATE" in line[:12]:
                     yield current_tree
                     current_tree = line
+                elif "End;" in line[:12]:
+                    break
                 else:
                     current_tree += line
         yield current_tree

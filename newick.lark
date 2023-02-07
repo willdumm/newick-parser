@@ -1,5 +1,5 @@
 // // Beast nexus definitions:
-beast_file : translate_block_wrapper beast_treelist
+beast_file : translate_block_wrapper beast_treelist "End;"?
 
 ?translate_block_wrapper : translate_block
 
@@ -42,20 +42,22 @@ NODENAME_STRING : /[^ :\[\](),\;\n\r\0]+/
 
 // // Annotations definitions
 
-annotations : ":" (support extendedannotation?
-                   |extendedannotation support?)
-            | extendedannotation (":"? support)?
+annotations : ":" (support extendedannotationlist?
+                   |extendedannotationlist support?)
+            | extendedannotationlist support?
 
 support : number
 
-?extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]"
+?extendedannotationlist : extendedannotation+
+?extendedannotation : "[" ["&"+ "NHX"? ":"?] annotationlist "]" ":"?
 
 annotationlist : annotation (":" annotation)* 
                | annotation ("," annotation)* 
 
 annotation : annotationname "=" data
 
-annotationname : CNAME
+annotationname : ANAME
+ANAME: ("_"|LETTER) ("_"|"-"|LETTER|DIGIT)*
 
 // lists with separator | may not be nested, but lists with directional
 // delimeters may be, so they're defined separately:
@@ -99,6 +101,8 @@ ESCAPED_DOUBLE_QUOTE_STRING : "\"" _STRING_ESC_INNER "\""
 ESCAPED_SINGLE_QUOTE_STRING : "'" _STRING_ESC_INNER "'"
 
 %import common.CNAME
+%import common.LETTER
+%import common.DIGIT
 %import common.INT
 %import common.SIGNED_INT
 %import common.SIGNED_FLOAT
