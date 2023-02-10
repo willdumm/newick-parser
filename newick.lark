@@ -16,7 +16,7 @@ TAXON_NAME : /[^ ,\n\r]+/
 
 beast_treelist : beast_tree+ -> list
 
-beast_tree : "tree" beast_name extendedannotation "=" "[&" rice_annotation "]" newicktree
+beast_tree : "tree" beast_name "=" newicktree
 
 beast_name : CNAME -> string
 

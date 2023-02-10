@@ -86,16 +86,19 @@ class NexusTransformer(TreelistTransformer):
 
     def beast_tree(self, s):
         tree = s[-1]
+        # print(type(tree))
+        # print(s)
         tree.add_feature("beast_name", s[0])
-        tree.add_feature("beast_annotations", dict(s[1]))
-        tree.add_feature("rice_annotation", s[2])
+        # tree.add_feature("beast_annotations", dict(s[1]))
+        # tree.add_feature("rice_annotation", s[2])
         return tree
 
     def beast_file(self, s):
         return s[1]
 
-
-with open("newick.lark", "r") as fh:
+import os
+dirpath = os.path.dirname(os.path.realpath(__file__))   # Get the directory of newick.lark so we can use an absolute path
+with open(dirpath+"/newick.lark", "r") as fh:
     newick_lark_string = fh.read()
 
 _nexus_parser = Lark(
@@ -165,6 +168,8 @@ class NexusIterator:
 
     def iter_trees(self):
         for treestring in self.iter_tree_sections():
+            # Remove `tree STATE_0 = `
+            # treestring = treestring[treestring.find("=")+2:]
             yield self.nexus_newick_parser.parse(treestring)
 
 
